@@ -1,0 +1,27 @@
+name: lenet5
+channels:
+  - conda-forge
+  - defaults
+
+dependencies:
+  - python=3.10
+  - numpy
+  - scipy
+  - pandas
+  - matplotlib
+  - pillow
+  - pyyaml
+  - tqdm
+  - jupyter
+  - notebook
+  - pip
+  - pip:
+      - mindspore
+      - reportlab
+      - fpdf2
+      - openai==2.3.0
+      - asttokens==3.0.1
+      - astunparse==1.6.3
+      - dill==0.4.1
+      - protobuf
+      - safetensors==0.7.0

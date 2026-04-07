@@ -1,0 +1,510 @@
+# ===============================================================================================
+# The following shows the last analyze fail log message.
+# ===============================================================================================
+
+----------------------------------------------------
+- Caught exception:
+----------------------------------------------------
+For 'Conv2D', 'C_in' of input 'x' shape divide by parameter 'group' must be equal to 'C_in' of input 'weight' shape: 1, but got 'C_in' of input 'x' shape: 28, and 'group': 1.
+
+----------------------------------------------------
+- C++ Call Stack: (For framework developers)
+----------------------------------------------------
+mindspore/ops/infer//conv2d.cc:240 Conv2dInferShape
+
+----------------------------------------------------
+- The Traceback of Net Construct Code:
+----------------------------------------------------
+# 0 In file /Users/christcheng/miniforge3/envs/lenet5/lib/python3.10/site-packages/mindspore/ops/composite/base.py:600, 31~56
+                        return grad_(fn, weights)(*args)
+                               ^~~~~~~~~~~~~~~~~~~~~~~~~
+# 1 In file /Users/christcheng/Code/python/lenet5_experiment/lenet5_base.py:167, 17~28
+        logits = model(data)
+                 ^~~~~~~~~~~
+# 2 In file /Users/christcheng/Code/python/lenet5_experiment/lenet5_base.py:55, 12~25
+        x = self.conv1(x)
+            ^~~~~~~~~~~~~
+# 3 In file /Users/christcheng/miniforge3/envs/lenet5/lib/python3.10/site-packages/mindspore/nn/layer/conv.py:367~368, 8~53
+        if self.has_bias:
+# 4 In file /Users/christcheng/miniforge3/envs/lenet5/lib/python3.10/site-packages/mindspore/nn/layer/conv.py:366, 17~44
+        output = self.conv2d(x, self.weight)
+                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+# ===============================================================================================
+# The following shows the IR when the function graphs evaluation fails to help locate the problem.
+# You can search the last ------------------------> to the node which is evaluated failure.
+# Refer to https://www.mindspore.cn/search?inputValue=analyze_fail.ir to get more instructions.
+# ===============================================================================================
+
+# IR entry: @after_grad_6
+# Total subgraphs: 0
+
+# Total params: 10
+# Params:
+%para1_args0: <null>
+%para2_args1: <null>
+%para3_conv1.weight: <Ref[Tensor[Float32]], (6, 1, 5, 5), ref_key=conv1.weight, is_parameter>  :  has_default
+%para4_conv2.weight: <Ref[Tensor[Float32]], (16, 6, 5, 5), ref_key=conv2.weight, is_parameter>  :  has_default
+%para5_fc1.weight: <Ref[Tensor[Float32]], (120, 400), ref_key=fc1.weight, is_parameter>  :  has_default
+%para6_fc1.bias: <Ref[Tensor[Float32]], (120), ref_key=fc1.bias, is_parameter>  :  has_default
+%para7_fc2.weight: <Ref[Tensor[Float32]], (84, 120), ref_key=fc2.weight, is_parameter>  :  has_default
+%para8_fc2.bias: <Ref[Tensor[Float32]], (84), ref_key=fc2.bias, is_parameter>  :  has_default
+%para9_fc3.weight: <Ref[Tensor[Float32]], (10, 84), ref_key=fc3.weight, is_parameter>  :  has_default
+%para10_fc3.bias: <Ref[Tensor[Float32]], (10), ref_key=fc3.bias, is_parameter>  :  has_default
+
+subgraph attr:
+subgraph instance: after_grad_6 : 0x15493ba18
+# In file /Users/christcheng/miniforge3/envs/lenet5/lib/python3.10/site-packages/mindspore/ops/composite/base.py:598~600, 20~56/                    @jit/
+subgraph @after_grad_6() {
+  %0(CNode_19) = resolve(NameSpace[Entry: 'after_grad'], after_grad)
+      : (<External, NoShape>, <External, NoShape>) -> (<Func, NoShape>)
+      #scope: (Default)
+  %1(CNode_20) = MakeTuple(%para1_args0, %para2_args1)
+      : (<Tensor[Float32], (32, 28, 28, 1)>, <Tensor[Int32], (32)>) -> (<Tuple[Tensor[Float32],Tensor[Int32]], TupleShape((32, 28, 28, 1), (32))>)
+      #scope: (Default)
+
+#------------------------> 0
+  %2(CNode_21) = DoUnpackCall(%0, %1)
+      : (<Func, NoShape>, <Tuple[Tensor[Float32],Tensor[Int32]], TupleShape((32, 28, 28, 1), (32))>) -> (<null>)
+      #scope: (Default)
+  Return(%2)
+      : (<null>)
+      #scope: (Default)
+      # In file /Users/christcheng/miniforge3/envs/lenet5/lib/python3.10/site-packages/mindspore/ops/composite/base.py:600, 24~56/                        return grad_(fn, weights)(*args)/
+}
+# Order:
+#   1: @after_grad_6:CNode_19{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> Entry: 'after_grad', [2]: ValueNode<Symbol> after_grad}
+#   2: @after_grad_6:CNode_21{[0]: ValueNode<Primitive> DoUnpackCall, [1]: CNode_19, [2]: CNode_20}
+#   3: @after_grad_6:CNode_22{[0]: ValueNode<Primitive> Return, [1]: CNode_21}
+
+
+subgraph attr:
+core: 1
+subgraph instance: UnpackCall_7 : 0x135685018
+
+subgraph @UnpackCall_7(%para0_Parameter_8, %para0_Parameter_9) {
+  %0(CNode_23) = TupleGetItem(%para0_Parameter_9, I64(0))
+      : (<Tuple[Tensor[Float32],Tensor[Int32]], TupleShape((32, 28, 28, 1), (32))>, <Int64, NoShape>) -> (<Tensor[Float32], (32, 28, 28, 1)>)
+      #scope: (Default)
+  %1(CNode_24) = TupleGetItem(%para0_Parameter_9, I64(1))
+      : (<Tuple[Tensor[Float32],Tensor[Int32]], TupleShape((32, 28, 28, 1), (32))>, <Int64, NoShape>) -> (<Tensor[Int32], (32)>)
+      #scope: (Default)
+
+#------------------------> 1
+  %2(CNode_25) = Parameter_8(%0, %1)
+      : (<Tensor[Float32], (32, 28, 28, 1)>, <Tensor[Int32], (32)>) -> (<null>)
+      #scope: (Default)
+  Return(%2)
+      : (<null>)
+      #scope: (Default)
+}
+# Order:
+#   1: @UnpackCall_7:CNode_25{[0]: param_Parameter_8, [1]: CNode_23, [2]: CNode_24}
+#   2: @UnpackCall_7:CNode_26{[0]: ValueNode<Primitive> Return, [1]: CNode_25}
+
+
+subgraph attr:
+subgraph instance: after_grad_10 : 0x135685618
+# In file /Users/christcheng/miniforge3/envs/lenet5/lib/python3.10/site-packages/mindspore/ops/composite/base.py:598~600, 20~56/                    @jit/
+subgraph @after_grad_10(%para0_args0, %para0_args1) {
+  %0(CNode_27) = resolve(NameSpace[SymbolStr: 'Namespace:mindspore.ops.composite.base..<after_grad>'], grad_)
+      : (<External, NoShape>, <External, NoShape>) -> (<Func, NoShape>)
+      #scope: (Default)
+      # In file /Users/christcheng/miniforge3/envs/lenet5/lib/python3.10/site-packages/mindspore/ops/composite/base.py:600, 31~36/                        return grad_(fn, weights)(*args)/
+  %1(CNode_28) = resolve(NameSpace[SymbolStr: 'Namespace:mindspore.ops.composite.base..<after_grad>'], fn)
+      : (<External, NoShape>, <External, NoShape>) -> (<Func, NoShape>)
+      #scope: (Default)
+      # In file /Users/christcheng/miniforge3/envs/lenet5/lib/python3.10/site-packages/mindspore/ops/composite/base.py:600, 37~39/                        return grad_(fn, weights)(*args)/
+  %2(CNode_29) = resolve(NameSpace[SymbolStr: 'Namespace:mindspore.ops.composite.base..<after_grad>'], weights)
+      : (<External, NoShape>, <External, NoShape>) -> (<Tuple[Ref[Tensor[Float32]]*8], TupleShape((6, 1, 5, 5), (16, 6, 5, 5), (120, 400), (120), (84, 120), (84), (10, 84), (10))>)
+      #scope: (Default)
+      # In file /Users/christcheng/miniforge3/envs/lenet5/lib/python3.10/site-packages/mindspore/ops/composite/base.py:600, 41~48/                        return grad_(fn, weights)(*args)/
+  %3(CNode_30) = %0(%1, %2)
+      : (<Func, NoShape>, <Tuple[Ref[Tensor[Float32]]*8], TupleShape((6, 1, 5, 5), (16, 6, 5, 5), (120, 400), (120), (84, 120), (84), (10, 84), (10))>) -> (<Func, NoShape>)
+      #scope: (Default)
+      # In file /Users/christcheng/miniforge3/envs/lenet5/lib/python3.10/site-packages/mindspore/ops/composite/base.py:600, 31~49/                        return grad_(fn, weights)(*args)/
+  %4(CNode_31) = MakeTuple(%para0_args0, %para0_args1)
+      : (<Tensor[Float32], (32, 28, 28, 1)>, <Tensor[Int32], (32)>) -> (<Tuple[Tensor[Float32],Tensor[Int32]], TupleShape((32, 28, 28, 1), (32))>)
+      #scope: (Default)
+      # In file /Users/christcheng/miniforge3/envs/lenet5/lib/python3.10/site-packages/mindspore/ops/composite/base.py:599, 36~40/                    def after_grad(*args):/
+
+#------------------------> 2
+  %5(CNode_32) = DoUnpackCall(%3, %4)
+      : (<Func, NoShape>, <Tuple[Tensor[Float32],Tensor[Int32]], TupleShape((32, 28, 28, 1), (32))>) -> (<null>)
+      #scope: (Default)
+      # In file /Users/christcheng/miniforge3/envs/lenet5/lib/python3.10/site-packages/mindspore/ops/composite/base.py:600, 31~56/                        return grad_(fn, weights)(*args)/
+  Return(%5)
+      : (<null>)
+      #scope: (Default)
+      # In file /Users/christcheng/miniforge3/envs/lenet5/lib/python3.10/site-packages/mindspore/ops/composite/base.py:600, 24~56/                        return grad_(fn, weights)(*args)/
+}
+# Order:
+#   1: @after_grad_10:CNode_27{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> SymbolStr: 'Namespace:mindspore.ops.composite.base..<after_grad>', [2]: ValueNode<Symbol> grad_}
+#   2: @after_grad_10:CNode_28{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> SymbolStr: 'Namespace:mindspore.ops.composite.base..<after_grad>', [2]: ValueNode<Symbol> fn}
+#   3: @after_grad_10:CNode_29{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> SymbolStr: 'Namespace:mindspore.ops.composite.base..<after_grad>', [2]: ValueNode<Symbol> weights}
+#   4: @after_grad_6:CNode_33{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> CommonOPS: 'Namespace:mindspore._extends.parse.trope', [2]: ValueNode<Symbol> MakeTuple}
+#   5: @after_grad_10:CNode_30{[0]: CNode_27, [1]: CNode_28, [2]: CNode_29}
+#   6: @after_grad_10:CNode_34{[0]: ValueNode<UnpackGraphPrimitive> UnpackGraph, [1]: CNode_28, [2]: CNode_31}
+#   7: @after_grad_10:CNode_32{[0]: ValueNode<Primitive> DoUnpackCall, [1]: CNode_30, [2]: CNode_31}
+#   8: @after_grad_10:CNode_35{[0]: ValueNode<Primitive> Return, [1]: CNode_32}
+
+
+subgraph attr:
+core: 1
+subgraph instance: UnpackCall_11 : 0x1478ae618
+
+subgraph @UnpackCall_11(%para0_Parameter_12, %para0_Parameter_13) {
+  %0(CNode_36) = TupleGetItem(%para0_Parameter_13, I64(0))
+      : (<Tuple[Tensor[Float32],Tensor[Int32]], TupleShape((32, 28, 28, 1), (32))>, <Int64, NoShape>) -> (<Tensor[Float32], (32, 28, 28, 1)>)
+      #scope: (Default)
+  %1(CNode_37) = TupleGetItem(%para0_Parameter_13, I64(1))
+      : (<Tuple[Tensor[Float32],Tensor[Int32]], TupleShape((32, 28, 28, 1), (32))>, <Int64, NoShape>) -> (<Tensor[Int32], (32)>)
+      #scope: (Default)
+
+#------------------------> 3
+  %2(CNode_38) = Parameter_12(%0, %1)
+      : (<Tensor[Float32], (32, 28, 28, 1)>, <Tensor[Int32], (32)>) -> (<null>)
+      #scope: (Default)
+  Return(%2)
+      : (<null>)
+      #scope: (Default)
+}
+# Order:
+#   1: @UnpackCall_11:CNode_38{[0]: param_Parameter_12, [1]: CNode_36, [2]: CNode_37}
+#   2: @UnpackCall_11:CNode_39{[0]: ValueNode<Primitive> Return, [1]: CNode_38}
+
+
+subgraph attr:
+k_graph: 1
+core: 1
+args_no_expand: 1
+subgraph instance: grad_forward_fn_14 : 0x1478ac218
+# In file /Users/christcheng/Code/python/lenet5_experiment/lenet5_base.py:166~169, 4~27/    def forward_fn(data, label):/
+subgraph @grad_forward_fn_14 parent: [subgraph @grad_forward_fn_40](%para0_grad_forward_fn, %para0_grad_forward_fn) {
+  %0(CNode_41) = J(%para_Parameter_42) primitive_attrs: {side_effect_propagate: I64(1)}
+      : (<Func, NoShape>) -> (<Func, NoShape>)
+      #scope: (Default)
+
+#------------------------> 4
+  %1(CNode_43) = %0(%para0_grad_forward_fn, %para0_grad_forward_fn)
+      : (<Tensor[Float32], (32, 28, 28, 1)>, <Tensor[Int32], (32)>) -> (<null>)
+      #scope: (Default)
+  %2(CNode_44) = TupleGetItem(%1, I64(0))
+      : (<null>, <null>) -> (<null>)
+      #scope: (Default)
+  %3(CNode_45) = TupleGetItem(%1, I64(1))
+      : (<null>, <null>) -> (<null>)
+      #scope: (Default)
+  %4(CNode_46) = HyperMapPy_hyper_map[_ones_like_for_grad]{fn_leaf: MultitypeFuncGraph__ones_like_for_grad{(TypeType), (Tensor), (Number), (COOTensor), (CSRTensor), (Func), (NoneType)}}(%2)
+      : (<null>) -> (<null>)
+      #scope: (Default)
+  %5(CNode_47) = %3(%4)
+      : (<null>) -> (<null>)
+      #scope: (Default)
+  %6(CNode_48) = TupleGetItem(%5, I64(0))
+      : (<null>, <null>) -> (<null>)
+      #scope: (Default)
+  %7(CNode_49) = Partial(MultitypeFuncGraph_env_get{(EnvType, Tensor), (EnvType, MapTensor)}, %6) primitive_attrs: {side_effect_propagate: I64(1)}
+      : (<null>, <null>) -> (<null>)
+      #scope: (Default)
+  %8(CNode_50) = HyperMap_hyper_map(%7, $(@grad_forward_fn_40:para_Parameter_51))
+      : (<null>, <Tuple[Ref[Tensor[Float32]]*8], TupleShape((6, 1, 5, 5), (16, 6, 5, 5), (120, 400), (120), (84, 120), (84), (10, 84), (10))>) -> (<null>)
+      #scope: (Default)
+  %9(CNode_52) = MakeTuple(%2, %8)
+      : (<null>, <null>) -> (<null>)
+      #scope: (Default)
+  Return(%9)
+      : (<null>)
+      #scope: (Default)
+}
+# Order:
+#   1: @grad_forward_fn_14:CNode_43{[0]: CNode_41, [1]: param_grad_forward_fn, [2]: param_grad_forward_fn}
+#   2: @grad_forward_fn_14:CNode_44{[0]: ValueNode<Primitive> TupleGetItem, [1]: CNode_43, [2]: ValueNode<Int64Imm> 0}
+#   3: @grad_forward_fn_14:CNode_45{[0]: ValueNode<Primitive> TupleGetItem, [1]: CNode_43, [2]: ValueNode<Int64Imm> 1}
+#   4: @grad_forward_fn_14:CNode_46{[0]: ValueNode<HyperMapPy> MetaFuncGraph-hyper_map[_ones_like_for_grad].53, [1]: CNode_44}
+#   5: @grad_forward_fn_14:CNode_47{[0]: CNode_45, [1]: CNode_46}
+#   6: @grad_forward_fn_14:CNode_48{[0]: ValueNode<Primitive> TupleGetItem, [1]: CNode_47, [2]: ValueNode<Int64Imm> 0}
+#   7: @grad_forward_fn_14:CNode_49{[0]: ValueNode<Primitive> Partial, [1]: ValueNode<MultitypeFuncGraph> MetaFuncGraph-env_get.54, [2]: CNode_48}
+#   8: @grad_forward_fn_14:CNode_50{[0]: ValueNode<HyperMap> MetaFuncGraph-hyper_map.55, [1]: CNode_49, [2]: param_Parameter_51}
+#   9: @grad_forward_fn_14:CNode_52{[0]: ValueNode<Primitive> MakeTuple, [1]: CNode_44, [2]: CNode_50}
+#  10: @grad_forward_fn_14:CNode_56{[0]: ValueNode<Primitive> Return, [1]: CNode_52}
+
+
+subgraph attr:
+defer_inline: 1
+subgraph instance: forward_fn_5 : 0x13568c818
+# In file /Users/christcheng/Code/python/lenet5_experiment/lenet5_base.py:166~169, 4~27/    def forward_fn(data, label):/
+subgraph @forward_fn_5(%para0_data, %para0_label) {
+  %0(CNode_57) = resolve(NameSpace[CommonOPS: 'Namespace:mindspore._extends.parse.trope'], MakeTuple)
+      : (<External, NoShape>, <External, NoShape>) -> (<Func, NoShape>)
+      #scope: (Default)
+      # In file /Users/christcheng/Code/python/lenet5_experiment/lenet5_base.py:169, 15~27/        return loss, logits/
+  %1(CNode_58) = resolve(NameSpace[SymbolStr: 'Namespace:__main__..<forward_fn>'], loss_fn)
+      : (<External, NoShape>, <External, NoShape>) -> (<Func, NoShape>)
+      #scope: (Default)
+      # In file /Users/christcheng/Code/python/lenet5_experiment/lenet5_base.py:168, 15~22/        loss = loss_fn(logits, label)/
+  %2(CNode_59) = resolve(NameSpace[SymbolStr: 'Namespace:__main__..<forward_fn>'], model)
+      : (<External, NoShape>, <External, NoShape>) -> (<Func, NoShape>)
+      #scope: (Default)
+      # In file /Users/christcheng/Code/python/lenet5_experiment/lenet5_base.py:167, 17~22/        logits = model(data)/
+
+#------------------------> 5
+  %3(logits) = %2(%para0_data)
+      : (<Tensor[Float32], (32, 28, 28, 1)>) -> (<null>)
+      #scope: (Default)
+      # In file /Users/christcheng/Code/python/lenet5_experiment/lenet5_base.py:167, 17~28/        logits = model(data)/
+  %4(loss) = %1(%3, %para0_label)
+      : (<null>, <Tensor[Int32], (32)>) -> (<null>)
+      #scope: (Default)
+      # In file /Users/christcheng/Code/python/lenet5_experiment/lenet5_base.py:168, 15~37/        loss = loss_fn(logits, label)/
+  %5(CNode_60) = %0(%4, %3)
+      : (<null>, <null>) -> (<null>)
+      #scope: (Default)
+      # In file /Users/christcheng/Code/python/lenet5_experiment/lenet5_base.py:169, 15~27/        return loss, logits/
+  %6(CNode_61) = GradAux_aux_fn(%5, Bool(1))
+      : (<null>, <null>) -> (<null>)
+      #scope: (Default)
+  Return(%6)
+      : (<null>)
+      #scope: (Default)
+      # In file /Users/christcheng/Code/python/lenet5_experiment/lenet5_base.py:169, 8~27/        return loss, logits/
+}
+# Order:
+#   1: @forward_fn_5:CNode_59{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> SymbolStr: 'Namespace:__main__..<forward_fn>', [2]: ValueNode<Symbol> model}
+#   2: @forward_fn_5:CNode_62{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> CommonOPS: 'Namespace:mindspore._extends.parse.trope', [2]: ValueNode<Symbol> MakeTuple}
+#   4: @forward_fn_5:logits{[0]: CNode_59, [1]: param_data}
+#   5: @forward_fn_5:CNode_58{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> SymbolStr: 'Namespace:__main__..<forward_fn>', [2]: ValueNode<Symbol> loss_fn}
+#   6: @forward_fn_5:CNode_63{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> CommonOPS: 'Namespace:mindspore._extends.parse.trope', [2]: ValueNode<Symbol> MakeTuple}
+#   8: @forward_fn_5:loss{[0]: CNode_58, [1]: logits, [2]: param_label}
+#   9: @forward_fn_5:CNode_57{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> CommonOPS: 'Namespace:mindspore._extends.parse.trope', [2]: ValueNode<Symbol> MakeTuple}
+#  10: @forward_fn_5:CNode_60{[0]: CNode_57, [1]: loss, [2]: logits}
+#  11: @forward_fn_5:CNode_64{[0]: ValueNode<Primitive> Return, [1]: CNode_61}
+#  12: @forward_fn_5:CNode_61{[0]: ValueNode<GradAux> MetaFuncGraph-aux_fn.65, [1]: CNode_60, [2]: ValueNode<BoolImm> true}
+
+
+subgraph attr:
+subgraph instance: __main___LeNet5_construct_15 : 0x135619a18
+# In file /Users/christcheng/Code/python/lenet5_experiment/lenet5_base.py:52~82, 4~16/    def construct(self, x):/
+subgraph @__main___LeNet5_construct_15(%para0_x) {
+  %0(CNode_66) = resolve(NameSpace[ClassMember: 'Namespace:__main__..<LeNet5::5490482272>'], fc3)
+      : (<External, NoShape>, <External, NoShape>) -> (<Func, NoShape>)
+      #scope: (Default)
+      # In file /Users/christcheng/Code/python/lenet5_experiment/lenet5_base.py:80, 12~20/        x = self.fc3(x)/
+  %1(CNode_67) = resolve(NameSpace[ClassMember: 'Namespace:__main__..<LeNet5::5490482272>'], relu)
+      : (<External, NoShape>, <External, NoShape>) -> (<Func, NoShape>)
+      #scope: (Default)
+      # In file /Users/christcheng/Code/python/lenet5_experiment/lenet5_base.py:77, 12~21/        x = self.relu(x)/
+  %2(CNode_68) = resolve(NameSpace[ClassMember: 'Namespace:__main__..<LeNet5::5490482272>'], fc2)
+      : (<External, NoShape>, <External, NoShape>) -> (<Func, NoShape>)
+      #scope: (Default)
+      # In file /Users/christcheng/Code/python/lenet5_experiment/lenet5_base.py:76, 12~20/        x = self.fc2(x)/
+  %3(CNode_69) = resolve(NameSpace[ClassMember: 'Namespace:__main__..<LeNet5::5490482272>'], relu)
+      : (<External, NoShape>, <External, NoShape>) -> (<Func, NoShape>)
+      #scope: (Default)
+      # In file /Users/christcheng/Code/python/lenet5_experiment/lenet5_base.py:73, 12~21/        x = self.relu(x)/
+  %4(CNode_70) = resolve(NameSpace[ClassMember: 'Namespace:__main__..<LeNet5::5490482272>'], fc1)
+      : (<External, NoShape>, <External, NoShape>) -> (<Func, NoShape>)
+      #scope: (Default)
+      # In file /Users/christcheng/Code/python/lenet5_experiment/lenet5_base.py:72, 12~20/        x = self.fc1(x)/
+  %5(CNode_71) = resolve(NameSpace[ClassMember: 'Namespace:__main__..<LeNet5::5490482272>'], flatten)
+      : (<External, NoShape>, <External, NoShape>) -> (<Func, NoShape>)
+      #scope: (Default)
+      # In file /Users/christcheng/Code/python/lenet5_experiment/lenet5_base.py:69, 12~24/        x = self.flatten(x)/
+  %6(CNode_72) = resolve(NameSpace[ClassMember: 'Namespace:__main__..<LeNet5::5490482272>'], pool)
+      : (<External, NoShape>, <External, NoShape>) -> (<Func, NoShape>)
+      #scope: (Default)
+      # In file /Users/christcheng/Code/python/lenet5_experiment/lenet5_base.py:66, 12~21/        x = self.pool(x)/
+  %7(CNode_73) = resolve(NameSpace[ClassMember: 'Namespace:__main__..<LeNet5::5490482272>'], relu)
+      : (<External, NoShape>, <External, NoShape>) -> (<Func, NoShape>)
+      #scope: (Default)
+      # In file /Users/christcheng/Code/python/lenet5_experiment/lenet5_base.py:63, 12~21/        x = self.relu(x)/
+  %8(CNode_74) = resolve(NameSpace[ClassMember: 'Namespace:__main__..<LeNet5::5490482272>'], conv2)
+      : (<External, NoShape>, <External, NoShape>) -> (<Func, NoShape>)
+      #scope: (Default)
+      # In file /Users/christcheng/Code/python/lenet5_experiment/lenet5_base.py:62, 12~22/        x = self.conv2(x)/
+  %9(CNode_75) = resolve(NameSpace[ClassMember: 'Namespace:__main__..<LeNet5::5490482272>'], pool)
+      : (<External, NoShape>, <External, NoShape>) -> (<Func, NoShape>)
+      #scope: (Default)
+      # In file /Users/christcheng/Code/python/lenet5_experiment/lenet5_base.py:59, 12~21/        x = self.pool(x)/
+  %10(CNode_76) = resolve(NameSpace[ClassMember: 'Namespace:__main__..<LeNet5::5490482272>'], relu)
+      : (<External, NoShape>, <External, NoShape>) -> (<Func, NoShape>)
+      #scope: (Default)
+      # In file /Users/christcheng/Code/python/lenet5_experiment/lenet5_base.py:56, 12~21/        x = self.relu(x)/
+  %11(CNode_77) = resolve(NameSpace[ClassMember: 'Namespace:__main__..<LeNet5::5490482272>'], conv1)
+      : (<External, NoShape>, <External, NoShape>) -> (<Func, NoShape>)
+      #scope: (Default)
+      # In file /Users/christcheng/Code/python/lenet5_experiment/lenet5_base.py:55, 12~22/        x = self.conv1(x)/
+
+#------------------------> 6
+  %12(x) = %11(%para0_x)
+      : (<Tensor[Float32], (32, 28, 28, 1)>) -> (<null>)
+      #scope: (Default)
+      # In file /Users/christcheng/Code/python/lenet5_experiment/lenet5_base.py:55, 12~25/        x = self.conv1(x)/
+  %13(x) = %10(%12)
+      : (<null>) -> (<null>)
+      #scope: (Default)
+      # In file /Users/christcheng/Code/python/lenet5_experiment/lenet5_base.py:56, 12~24/        x = self.relu(x)/
+  %14(x) = %9(%13)
+      : (<null>) -> (<null>)
+      #scope: (Default)
+      # In file /Users/christcheng/Code/python/lenet5_experiment/lenet5_base.py:59, 12~24/        x = self.pool(x)/
+  %15(x) = %8(%14)
+      : (<null>) -> (<null>)
+      #scope: (Default)
+      # In file /Users/christcheng/Code/python/lenet5_experiment/lenet5_base.py:62, 12~25/        x = self.conv2(x)/
+  %16(x) = %7(%15)
+      : (<null>) -> (<null>)
+      #scope: (Default)
+      # In file /Users/christcheng/Code/python/lenet5_experiment/lenet5_base.py:63, 12~24/        x = self.relu(x)/
+  %17(x) = %6(%16)
+      : (<null>) -> (<null>)
+      #scope: (Default)
+      # In file /Users/christcheng/Code/python/lenet5_experiment/lenet5_base.py:66, 12~24/        x = self.pool(x)/
+  %18(x) = %5(%17)
+      : (<null>) -> (<null>)
+      #scope: (Default)
+      # In file /Users/christcheng/Code/python/lenet5_experiment/lenet5_base.py:69, 12~27/        x = self.flatten(x)/
+  %19(x) = %4(%18)
+      : (<null>) -> (<null>)
+      #scope: (Default)
+      # In file /Users/christcheng/Code/python/lenet5_experiment/lenet5_base.py:72, 12~23/        x = self.fc1(x)/
+  %20(x) = %3(%19)
+      : (<null>) -> (<null>)
+      #scope: (Default)
+      # In file /Users/christcheng/Code/python/lenet5_experiment/lenet5_base.py:73, 12~24/        x = self.relu(x)/
+  %21(x) = %2(%20)
+      : (<null>) -> (<null>)
+      #scope: (Default)
+      # In file /Users/christcheng/Code/python/lenet5_experiment/lenet5_base.py:76, 12~23/        x = self.fc2(x)/
+  %22(x) = %1(%21)
+      : (<null>) -> (<null>)
+      #scope: (Default)
+      # In file /Users/christcheng/Code/python/lenet5_experiment/lenet5_base.py:77, 12~24/        x = self.relu(x)/
+  %23(x) = %0(%22)
+      : (<null>) -> (<null>)
+      #scope: (Default)
+      # In file /Users/christcheng/Code/python/lenet5_experiment/lenet5_base.py:80, 12~23/        x = self.fc3(x)/
+  Return(%23)
+      : (<null>)
+      #scope: (Default)
+      # In file /Users/christcheng/Code/python/lenet5_experiment/lenet5_base.py:82, 8~16/        return x/
+}
+# Order:
+#   1: @__main___LeNet5_construct_15:CNode_77{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> ClassMember: 'Namespace:__main__..<LeNet5::5490482272>', [2]: ValueNode<Symbol> conv1}
+#   2: @__main___LeNet5_construct_15:CNode_78{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> CommonOPS: 'Namespace:mindspore._extends.parse.trope', [2]: ValueNode<Symbol> MakeTuple}
+#   4: @__main___LeNet5_construct_15:x{[0]: CNode_77, [1]: param_x}
+#   5: @__main___LeNet5_construct_15:CNode_76{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> ClassMember: 'Namespace:__main__..<LeNet5::5490482272>', [2]: ValueNode<Symbol> relu}
+#   6: @__main___LeNet5_construct_15:CNode_79{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> CommonOPS: 'Namespace:mindspore._extends.parse.trope', [2]: ValueNode<Symbol> MakeTuple}
+#   8: @__main___LeNet5_construct_15:x{[0]: CNode_76, [1]: x}
+#   9: @__main___LeNet5_construct_15:CNode_75{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> ClassMember: 'Namespace:__main__..<LeNet5::5490482272>', [2]: ValueNode<Symbol> pool}
+#  10: @__main___LeNet5_construct_15:CNode_80{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> CommonOPS: 'Namespace:mindspore._extends.parse.trope', [2]: ValueNode<Symbol> MakeTuple}
+#  12: @__main___LeNet5_construct_15:x{[0]: CNode_75, [1]: x}
+#  13: @__main___LeNet5_construct_15:CNode_74{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> ClassMember: 'Namespace:__main__..<LeNet5::5490482272>', [2]: ValueNode<Symbol> conv2}
+#  14: @__main___LeNet5_construct_15:CNode_81{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> CommonOPS: 'Namespace:mindspore._extends.parse.trope', [2]: ValueNode<Symbol> MakeTuple}
+#  16: @__main___LeNet5_construct_15:x{[0]: CNode_74, [1]: x}
+#  17: @__main___LeNet5_construct_15:CNode_73{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> ClassMember: 'Namespace:__main__..<LeNet5::5490482272>', [2]: ValueNode<Symbol> relu}
+#  18: @__main___LeNet5_construct_15:CNode_82{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> CommonOPS: 'Namespace:mindspore._extends.parse.trope', [2]: ValueNode<Symbol> MakeTuple}
+#  20: @__main___LeNet5_construct_15:x{[0]: CNode_73, [1]: x}
+#  21: @__main___LeNet5_construct_15:CNode_72{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> ClassMember: 'Namespace:__main__..<LeNet5::5490482272>', [2]: ValueNode<Symbol> pool}
+#  22: @__main___LeNet5_construct_15:CNode_83{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> CommonOPS: 'Namespace:mindspore._extends.parse.trope', [2]: ValueNode<Symbol> MakeTuple}
+#  24: @__main___LeNet5_construct_15:x{[0]: CNode_72, [1]: x}
+#  25: @__main___LeNet5_construct_15:CNode_71{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> ClassMember: 'Namespace:__main__..<LeNet5::5490482272>', [2]: ValueNode<Symbol> flatten}
+#  26: @__main___LeNet5_construct_15:CNode_84{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> CommonOPS: 'Namespace:mindspore._extends.parse.trope', [2]: ValueNode<Symbol> MakeTuple}
+#  28: @__main___LeNet5_construct_15:x{[0]: CNode_71, [1]: x}
+#  29: @__main___LeNet5_construct_15:CNode_70{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> ClassMember: 'Namespace:__main__..<LeNet5::5490482272>', [2]: ValueNode<Symbol> fc1}
+#  30: @__main___LeNet5_construct_15:CNode_85{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> CommonOPS: 'Namespace:mindspore._extends.parse.trope', [2]: ValueNode<Symbol> MakeTuple}
+#  32: @__main___LeNet5_construct_15:x{[0]: CNode_70, [1]: x}
+#  33: @__main___LeNet5_construct_15:CNode_69{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> ClassMember: 'Namespace:__main__..<LeNet5::5490482272>', [2]: ValueNode<Symbol> relu}
+#  34: @__main___LeNet5_construct_15:CNode_86{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> CommonOPS: 'Namespace:mindspore._extends.parse.trope', [2]: ValueNode<Symbol> MakeTuple}
+#  36: @__main___LeNet5_construct_15:x{[0]: CNode_69, [1]: x}
+#  37: @__main___LeNet5_construct_15:CNode_68{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> ClassMember: 'Namespace:__main__..<LeNet5::5490482272>', [2]: ValueNode<Symbol> fc2}
+#  38: @__main___LeNet5_construct_15:CNode_87{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> CommonOPS: 'Namespace:mindspore._extends.parse.trope', [2]: ValueNode<Symbol> MakeTuple}
+#  40: @__main___LeNet5_construct_15:x{[0]: CNode_68, [1]: x}
+#  41: @__main___LeNet5_construct_15:CNode_67{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> ClassMember: 'Namespace:__main__..<LeNet5::5490482272>', [2]: ValueNode<Symbol> relu}
+#  42: @__main___LeNet5_construct_15:CNode_88{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> CommonOPS: 'Namespace:mindspore._extends.parse.trope', [2]: ValueNode<Symbol> MakeTuple}
+#  44: @__main___LeNet5_construct_15:x{[0]: CNode_67, [1]: x}
+#  45: @__main___LeNet5_construct_15:CNode_66{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> ClassMember: 'Namespace:__main__..<LeNet5::5490482272>', [2]: ValueNode<Symbol> fc3}
+#  46: @__main___LeNet5_construct_15:CNode_89{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> CommonOPS: 'Namespace:mindspore._extends.parse.trope', [2]: ValueNode<Symbol> MakeTuple}
+#  48: @__main___LeNet5_construct_15:x{[0]: CNode_66, [1]: x}
+#  49: @__main___LeNet5_construct_15:CNode_90{[0]: ValueNode<Primitive> Return, [1]: x}
+
+
+subgraph attr:
+subgraph instance: mindspore_nn_layer_conv_Conv2d_construct_16 : 0x135625618
+# In file /Users/christcheng/miniforge3/envs/lenet5/lib/python3.10/site-packages/mindspore/nn/layer/conv.py:365~369, 4~21/    def construct(self, x):/
+subgraph @mindspore_nn_layer_conv_Conv2d_construct_16(%para0_x) {
+
+#------------------------> 7
+  %0(CNode_91) = call @✗mindspore_nn_layer_conv_Conv2d_construct_17()
+      #scope: (Default)
+      # In file /Users/christcheng/miniforge3/envs/lenet5/lib/python3.10/site-packages/mindspore/nn/layer/conv.py:367~368, 8~53/        if self.has_bias:/
+  Return(%0)
+      : (<null>)
+      #scope: (Default)
+      # In file /Users/christcheng/miniforge3/envs/lenet5/lib/python3.10/site-packages/mindspore/nn/layer/conv.py:367~368, 8~53/        if self.has_bias:/
+}
+# Order:
+#   1: @mindspore_nn_layer_conv_Conv2d_construct_16:CNode_92{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> ClassMember: 'Namespace:mindspore.nn.layer.conv..<Conv2d::5490489312>', [2]: ValueNode<Symbol> conv2d}
+#   2: @mindspore_nn_layer_conv_Conv2d_construct_16:CNode_93{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> ClassMember: 'Namespace:mindspore.nn.layer.conv..<Conv2d::5490489312>', [2]: ValueNode<Symbol> weight}
+#   3: @mindspore_nn_layer_conv_Conv2d_construct_16:CNode_94{[0]: ValueNode<Primitive> resolve, [1]: ValueNode<NameSpace> CommonOPS: 'Namespace:mindspore._extends.parse.trope', [2]: ValueNode<Symbol> MakeTuple}
+#   5: @mindspore_nn_layer_conv_Conv2d_construct_16:output{[0]: CNode_92, [1]: param_x, [2]: CNode_93}
+#   6: @mindspore_nn_layer_conv_Conv2d_construct_16:CNode_91{[0]: ValueNode<FuncGraph> ✗mindspore_nn_layer_conv_Conv2d_construct_17}
+#   7: @mindspore_nn_layer_conv_Conv2d_construct_16:CNode_95{[0]: ValueNode<Primitive> Return, [1]: CNode_91}
+
+
+subgraph attr:
+subgraph instance: ✗mindspore_nn_layer_conv_Conv2d_construct_17 : 0x13569b218
+# In file /Users/christcheng/miniforge3/envs/lenet5/lib/python3.10/site-packages/mindspore/nn/layer/conv.py:365~369, 4~21/    def construct(self, x):/
+subgraph @✗mindspore_nn_layer_conv_Conv2d_construct_17 parent: [subgraph @mindspore_nn_layer_conv_Conv2d_construct_16]() {
+
+#------------------------> 8
+  %0(CNode_96) = call @↓mindspore_nn_layer_conv_Conv2d_construct_18()
+      #scope: (Default)
+      # In file /Users/christcheng/miniforge3/envs/lenet5/lib/python3.10/site-packages/mindspore/nn/layer/conv.py:367~368, 8~53/        if self.has_bias:/
+  Return(%0)
+      : (<null>)
+      #scope: (Default)
+      # In file /Users/christcheng/miniforge3/envs/lenet5/lib/python3.10/site-packages/mindspore/nn/layer/conv.py:367~368, 8~53/        if self.has_bias:/
+}
+# Order:
+#   1: @✗mindspore_nn_layer_conv_Conv2d_construct_17:CNode_96{[0]: ValueNode<FuncGraph> ↓mindspore_nn_layer_conv_Conv2d_construct_18}
+#   2: @✗mindspore_nn_layer_conv_Conv2d_construct_17:CNode_97{[0]: ValueNode<Primitive> Return, [1]: CNode_96}
+
+
+subgraph attr:
+subgraph instance: ↓mindspore_nn_layer_conv_Conv2d_construct_18 : 0x135698c18
+# In file /Users/christcheng/miniforge3/envs/lenet5/lib/python3.10/site-packages/mindspore/nn/layer/conv.py:365~369, 4~21/    def construct(self, x):/
+subgraph @↓mindspore_nn_layer_conv_Conv2d_construct_18 parent: [subgraph @mindspore_nn_layer_conv_Conv2d_construct_16]() {
+  %0(CNode_92) = resolve(NameSpace[ClassMember: 'Namespace:mindspore.nn.layer.conv..<Conv2d::5490489312>'], conv2d)
+      : (<External, NoShape>, <External, NoShape>) -> (<Func, NoShape>)
+      #scope: (Default)
+      # In file /Users/christcheng/miniforge3/envs/lenet5/lib/python3.10/site-packages/mindspore/nn/layer/conv.py:366, 17~28/        output = self.conv2d(x, self.weight)/
+  %1(CNode_93) = resolve(NameSpace[ClassMember: 'Namespace:mindspore.nn.layer.conv..<Conv2d::5490489312>'], weight)
+      : (<External, NoShape>, <External, NoShape>) -> (<Ref[Tensor[Float32]], (6, 1, 5, 5)>)
+      #scope: (Default)
+      # In file /Users/christcheng/miniforge3/envs/lenet5/lib/python3.10/site-packages/mindspore/nn/layer/conv.py:366, 32~43/        output = self.conv2d(x, self.weight)/
+
+#------------------------> 9
+  %2(output) = %0(%para0_x, %1)
+      : (<Tensor[Float32], (32, 28, 28, 1)>, <Ref[Tensor[Float32]], (6, 1, 5, 5)>) -> (<null>)
+      #scope: (Default)
+      # In file /Users/christcheng/miniforge3/envs/lenet5/lib/python3.10/site-packages/mindspore/nn/layer/conv.py:366, 17~44/        output = self.conv2d(x, self.weight)/
+  Return(%2)
+      : (<null>)
+      #scope: (Default)
+      # In file /Users/christcheng/miniforge3/envs/lenet5/lib/python3.10/site-packages/mindspore/nn/layer/conv.py:369, 8~21/        return output/
+}
+# Order:
+#   1: @↓mindspore_nn_layer_conv_Conv2d_construct_18:CNode_98{[0]: ValueNode<Primitive> Return, [1]: output}
+
+
+# ===============================================================================================
+# The total of function graphs in evaluation stack: 10/13 (Ignored 3 internal frames).
+# ===============================================================================================
+
+
+# ===============================================================================================
+# The rest function graphs are the following:
+# ===============================================================================================
+No more function graphs.
+
