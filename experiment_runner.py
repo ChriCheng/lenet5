@@ -15,6 +15,18 @@ import json
 import os
 from datetime import datetime
 import time
+import random
+
+
+RANDOM_SEED = 42
+
+
+def set_random_seed(seed=RANDOM_SEED):
+    """固定随机种子，尽量保证实验可复现。"""
+    random.seed(seed)
+    np.random.seed(seed)
+    mindspore.set_seed(seed)
+    ds.config.set_seed(seed)
 
 
 class LeNet5(nn.Cell):
@@ -125,7 +137,7 @@ def train_and_evaluate(model, train_dataset, test_dataset, epochs, learning_rate
     elif optimizer_type == 'Adam':
         optimizer = nn.Adam(model.trainable_params(), learning_rate=learning_rate)
     elif optimizer_type == 'RMSprop':
-        optimizer = nn.RMSprop(model.trainable_params(), learning_rate=learning_rate)
+        optimizer = nn.RMSProp(model.trainable_params(), learning_rate=learning_rate)
     else:
         raise ValueError(f"Unknown optimizer: {optimizer_type}")
     
@@ -202,7 +214,7 @@ def train_and_evaluate(model, train_dataset, test_dataset, epochs, learning_rate
         history['test_acc'].append(float(test_acc))
         history['test_loss'].append(float(test_loss))
         
-        if verbose and (epoch + 1) % 2 == 0:
+        if verbose:
             print(f"  Epoch {epoch+1:2d}/{epochs} | "
                   f"Train Acc: {train_acc:.4f} | Test Acc: {test_acc:.4f}")
     
@@ -219,6 +231,8 @@ def train_and_evaluate(model, train_dataset, test_dataset, epochs, learning_rate
 
 def run_experiments():
     """运行所有参数对比实验"""
+
+    set_random_seed()
     
     # 设置MindSpore上下文
     mindspore.set_context(mode=mindspore.GRAPH_MODE)
@@ -277,6 +291,7 @@ def run_experiments():
         exp_results = []
         
         for i, params in enumerate(exp_config['params']):
+            set_random_seed()
             print(f"\n第 {i+1}/3 组实验:")
             print(f"  学习率: {params['learning_rate']}")
             print(f"  批大小: {params['batch_size']}")

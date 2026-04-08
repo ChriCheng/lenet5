@@ -163,7 +163,7 @@ def train_model(
     elif optimizer_type == "Adam":
         optimizer = nn.Adam(model.trainable_params(), learning_rate=learning_rate)
     elif optimizer_type == "RMSprop":
-        optimizer = nn.RMSprop(model.trainable_params(), learning_rate=learning_rate)
+        optimizer = nn.RMSProp(model.trainable_params(), learning_rate=learning_rate)
     else:
         raise ValueError(f"Unknown optimizer: {optimizer_type}")
 

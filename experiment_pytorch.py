@@ -8,9 +8,27 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
 from torchvision import datasets, transforms
+import numpy as np
 import json
 import time
 import os
+import random
+
+
+RANDOM_SEED = 42
+
+
+def set_random_seed(seed=RANDOM_SEED):
+    """固定随机种子，尽量保证实验可复现。"""
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed(seed)
+        torch.cuda.manual_seed_all(seed)
+    if torch.backends.cudnn.is_available():
+        torch.backends.cudnn.deterministic = True
+        torch.backends.cudnn.benchmark = False
 
 
 class LeNet5(nn.Module):
@@ -27,7 +45,7 @@ class LeNet5(nn.Module):
         self.pool = nn.AvgPool2d(kernel_size=2, stride=2)
 
         # 全连接层
-        self.fc1 = nn.Linear(16 * 4 * 4, 120)
+        self.fc1 = nn.Linear(16 * 5 * 5, 120)
         self.fc2 = nn.Linear(120, 84)
         self.fc3 = nn.Linear(84, 10)
 
@@ -36,21 +54,21 @@ class LeNet5(nn.Module):
 
     def forward(self, x):
         # C1: 卷积层
-        x = self.conv1(x)  # (1, 28, 28) -> (6, 24, 24)
+        x = self.conv1(x)  # (1, 32, 32) -> (6, 28, 28)
         x = self.relu(x)
 
         # S2: 池化层
-        x = self.pool(x)  # (6, 24, 24) -> (6, 12, 12)
+        x = self.pool(x)  # (6, 28, 28) -> (6, 14, 14)
 
         # C3: 卷积层
-        x = self.conv2(x)  # (6, 12, 12) -> (16, 8, 8)
+        x = self.conv2(x)  # (6, 14, 14) -> (16, 10, 10)
         x = self.relu(x)
 
         # S4: 池化层
-        x = self.pool(x)  # (16, 8, 8) -> (16, 4, 4)
+        x = self.pool(x)  # (16, 10, 10) -> (16, 5, 5)
 
         # 展平
-        x = x.view(x.size(0), -1)  # (16, 4, 4) -> (batch_size, 256)
+        x = x.view(x.size(0), -1)  # (16, 5, 5) -> (batch_size, 400)
 
         # F5: 全连接层
         x = self.fc1(x)
@@ -67,13 +85,17 @@ class LeNet5(nn.Module):
 
 
 def create_mnist_dataloaders(
-    batch_size=32, num_train_samples=5000, num_test_samples=1000
+    batch_size=32, num_train_samples=5000, num_test_samples=1000, seed=RANDOM_SEED
 ):
     """创建MNIST数据加载器"""
 
     # 数据预处理
     transform = transforms.Compose(
-        [transforms.ToTensor(), transforms.Normalize((0.1307,), (0.3081,))]
+        [
+            transforms.Resize((32, 32)),
+            transforms.ToTensor(),
+            transforms.Normalize((0.1307,), (0.3081,)),
+        ]
     )
 
     # 加载训练集
@@ -86,8 +108,15 @@ def create_mnist_dataloaders(
         train_dataset, range(min(num_train_samples, len(train_dataset)))
     )
 
+    generator = torch.Generator()
+    generator.manual_seed(seed)
+
     train_loader = DataLoader(
-        train_dataset, batch_size=batch_size, shuffle=True, num_workers=0
+        train_dataset,
+        batch_size=batch_size,
+        shuffle=True,
+        num_workers=0,
+        generator=generator,
     )
 
     # 加载测试集
@@ -199,7 +228,7 @@ def train_and_evaluate(
         history["test_acc"].append(test_acc)
         history["test_loss"].append(test_loss)
 
-        if verbose and (epoch + 1) % 2 == 0:
+        if verbose:
             print(
                 f"  Epoch {epoch+1:2d}/{epochs} | "
                 f"Train Acc: {train_acc:.4f} | Test Acc: {test_acc:.4f}"
@@ -220,6 +249,8 @@ def train_and_evaluate(
 
 def run_experiments():
     """运行所有参数对比实验"""
+
+    set_random_seed()
 
     # 检查GPU
     device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -277,6 +308,7 @@ def run_experiments():
         exp_results = []
 
         for i, params in enumerate(exp_config["params"]):
+            set_random_seed()
             print(f"\n第 {i+1}/3 组实验:")
             print(f"  学习率: {params['learning_rate']}")
             print(f"  批大小: {params['batch_size']}")
@@ -287,6 +319,7 @@ def run_experiments():
                 batch_size=params["batch_size"],
                 num_train_samples=5000,
                 num_test_samples=1000,
+                seed=RANDOM_SEED,
             )
 
             # 创建新的模型
