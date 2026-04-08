@@ -8,6 +8,31 @@
 
 ```
 lenet5_experiment/
+├── readme.md   
+├── LeNet5_MNIST_Experiment_Report.md
+├── LeNet5_MNIST_Experiment_Report.pdf
+├── LeNet5_MindSpore_Code.zip
+├── data
+│   ├── MNIST
+├── download_mnist.py
+├── environment.yml
+├── experiment_pytorch.py
+├── experiment_results.json
+├── experiment_runner_v2.py
+├── figures
+│   ├── batch_size_comparison.png
+│   ├── comprehensive_comparison.png
+│   ├── learning_rate_comparison.png
+│   └── optimizer_comparison.png
+├── lenet5_base.py
+├── log
+│   ├── torch.log
+│   ├── trainv2.log
+│   └── visualize.log
+├── readme.md                               # 实验报告
+└── visualize_results.py                    # 实验结果可视化脚本
+
+
 ├── LeNet5_MNIST_Experiment_Report.pdf    # 完整的实验报告（PDF格式）
 ├── LeNet5_MindSpore_Code.zip             # 核心代码打包文件
 ├── lenet5_base.py                        # LeNet-5网络定义和基础训练代码
@@ -95,111 +120,21 @@ LeNet-5 是一个 7 层的卷积神经网络，具体结构如下：
 ## 实验结果摘要
 
 ### 学习率对比
-- **LR=0.001**: 测试准确率 13.6%（收敛缓慢）
-- **LR=0.01**: 测试准确率 65.4%（正常收敛）
-- **LR=0.1**: 测试准确率 96.0%（快速收敛）✓ 最优
+- **LR=0.001**: 测试准确率 95.2%（收敛缓慢）
+- **LR=0.01**: 测试准确率 95.5%（正常收敛）✓ 最优
+- **LR=0.1**: 测试准确率 12.6%（快速收敛）
+
+没有 momentum 沿稳定方向推进，过高学习率容易容易在梯度下降中难以有效降低loss
 
 ### 批大小对比
-- **BS=16**: 测试准确率 86.3%（最高）✓ 最优
-- **BS=32**: 测试准确率 83.1%
-- **BS=64**: 测试准确率 64.5%（收敛缓慢）
+- **BS=16**: 测试准确率 94.0%（耗时210.89s）
+- **BS=32**: 测试准确率 95.5%（耗时81.39s）✓ 最优
+- **BS=64**: 测试准确率 96.4%（耗时61.74s） 
 
+合理的batchsize兼具准确度与耗时
 ### 优化器对比
-- **SGD**: 测试准确率 49.2%（表现不佳）
-- **Adam**: 测试准确率 97.1%（最高）✓ 最优
-- **RMSprop**: 测试准确率 94.5%（次优）
+- **SGD**: 测试准确率 95.5% ✓ 最优
+- **Adam**: 测试准确率 89.4%  
+- **RMSprop**: 测试准确率 73.6%
 
-## 环境要求
-
-### 依赖包
-- Python 3.11+
-- MindSpore 2.8.0
-- PyTorch 2.11.0+（可选）
-- NumPy
-- Matplotlib
-- Torchvision（用于 PyTorch 版本）
-
-### 安装依赖
-```bash
-# 安装 MindSpore
-sudo uv pip install --system mindspore
-
-# 安装 PyTorch（可选）
-sudo uv pip install --system torch torchvision
-
-# 安装其他依赖
-sudo uv pip install --system matplotlib numpy
-```
-
-## 使用说明
-
-### 步骤 1：准备环境
-```bash
-cd /home/ubuntu/lenet5_experiment
-```
-
-### 步骤 2：下载数据集
-MNIST 数据集会在首次运行时自动下载到 `./data` 目录。
-
-### 步骤 3：运行实验
-```bash
-# 运行 MindSpore 版本的参数对比实验
-python3 experiment_runner_v2.py
-
-# 或运行 PyTorch 版本
-python3 experiment_pytorch.py
-```
-
-### 步骤 4：生成可视化图表
-```bash
-python3 visualize_results.py
-```
-
-### 步骤 5：查看结果
-- 实验结果保存在 `experiment_results.json`
-- 图表保存在 `figures/` 目录
-- 完整报告在 `LeNet5_MNIST_Experiment_Report.pdf`
-
-## 关键发现
-
-1. **学习率的重要性**：在 SGD 优化器下，学习率从 0.001 提升到 0.1 时，测试准确率从 13.6% 提升到 96.0%，说明学习率的选择对模型性能有决定性影响。
-
-2. **批大小的权衡**：较小的批大小（16）相比较大的批大小（64）能取得更好的准确率（86.3% vs 64.5%），但会增加训练时间。
-
-3. **优化器的优越性**：自适应优化器（Adam、RMSprop）相比基础 SGD 表现出显著优势，Adam 达到 97.1% 的测试准确率，而 SGD 仅有 49.2%。
-
-## 实验报告
-
-详细的实验报告请参阅 `LeNet5_MNIST_Experiment_Report.pdf`，包含：
-- 详细的网络结构介绍
-- 实验设计与方法
-- 完整的实验结果与分析
-- 结论与建议
-
-## 代码特点
-
-- **模块化设计**：代码结构清晰，易于理解和扩展
-- **完整的注释**：每个关键函数都有详细的中文注释
-- **灵活的参数**：支持自定义学习率、批大小、优化器等参数
-- **详细的日志**：训练过程中输出详细的进度信息
-- **结果保存**：自动保存实验结果为 JSON 格式，便于后续分析
-
-## 扩展建议
-
-1. **增加更多优化器**：可以尝试 Adagrad、Adadelta 等其他优化器
-2. **数据增强**：使用旋转、缩放等数据增强技术提升模型泛化能力
-3. **网络改进**：尝试添加 Dropout、Batch Normalization 等正则化技术
-4. **超参数搜索**：使用网格搜索或贝叶斯优化进行更系统的超参数调优
-5. **模型保存与加载**：实现模型的保存和加载功能，便于后续使用
-
-## 许可证
-
-本项目仅供学习和研究使用。
-
-## 联系方式
-
-如有任何问题或建议，欢迎反馈。
-
----
-
-**最后更新：** 2026年3月30日
+这里是受到我自己科研的启发，在我的那个项目中adam优化器能提高约10%的准确度，此处是传统SGD效果最好

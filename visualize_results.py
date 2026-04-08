@@ -103,8 +103,16 @@ axes[0, 0].set_xlabel('Batch Size', fontsize=11)
 axes[0, 0].set_ylabel('Accuracy', fontsize=11)
 axes[0, 0].set_title('Final Test Accuracy vs Batch Size')
 axes[0, 0].grid(True, alpha=0.3)
+axes[0, 0].set_ylim(0, min(1.0, max(final_test_accs) + 0.08))
 for i, (bs, acc) in enumerate(zip(batch_sizes, final_test_accs)):
-    axes[0, 0].text(bs, acc + 0.02, f'{acc:.3f}', ha='center', fontsize=10)
+    axes[0, 0].annotate(
+        f'{acc:.3f}',
+        xy=(bs, acc),
+        xytext=(0, 8),
+        textcoords='offset points',
+        ha='center',
+        fontsize=10,
+    )
 
 # 训练准确率
 axes[0, 1].plot(batch_sizes, final_train_accs, 's-', linewidth=2, markersize=8)
@@ -112,8 +120,16 @@ axes[0, 1].set_xlabel('Batch Size', fontsize=11)
 axes[0, 1].set_ylabel('Accuracy', fontsize=11)
 axes[0, 1].set_title('Final Train Accuracy vs Batch Size')
 axes[0, 1].grid(True, alpha=0.3)
+axes[0, 1].set_ylim(0, min(1.0, max(final_train_accs) + 0.08))
 for i, (bs, acc) in enumerate(zip(batch_sizes, final_train_accs)):
-    axes[0, 1].text(bs, acc + 0.02, f'{acc:.3f}', ha='center', fontsize=10)
+    axes[0, 1].annotate(
+        f'{acc:.3f}',
+        xy=(bs, acc),
+        xytext=(0, 8),
+        textcoords='offset points',
+        ha='center',
+        fontsize=10,
+    )
 
 # 训练时间
 axes[1, 0].bar(range(len(batch_sizes)), training_times, color=['#1f77b4', '#ff7f0e', '#2ca02c'])
@@ -122,8 +138,16 @@ axes[1, 0].set_ylabel('Training Time (s)', fontsize=11)
 axes[1, 0].set_title('Training Time vs Batch Size')
 axes[1, 0].set_xticks(range(len(batch_sizes)))
 axes[1, 0].set_xticklabels([f'{bs}' for bs in batch_sizes])
+axes[1, 0].set_ylim(0, max(training_times) + 1.0)
 for i, t in enumerate(training_times):
-    axes[1, 0].text(i, t + 0.2, f'{t:.2f}s', ha='center', fontsize=10)
+    axes[1, 0].annotate(
+        f'{t:.2f}s',
+        xy=(i, t),
+        xytext=(0, 8),
+        textcoords='offset points',
+        ha='center',
+        fontsize=10,
+    )
 
 # 训练曲线（最好的批大小）
 best_idx = np.argmax(final_test_accs)

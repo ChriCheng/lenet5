@@ -330,7 +330,7 @@ def run_experiments():
                 model,
                 train_loader,
                 test_loader,
-                epochs=5,
+                epochs=20,
                 learning_rate=params["learning_rate"],
                 optimizer_type=params["optimizer"],
                 device=device,

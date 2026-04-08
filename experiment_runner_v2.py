@@ -1,7 +1,6 @@
 """
 LeNet-5参数对比实验 - 优化版本
 采用控制变量法，对学习率、批大小、优化器三种参数进行实验
-使用PYNATIVE模式以避免内存问题
 """
 
 import mindspore
@@ -140,9 +139,9 @@ def train_and_evaluate(
     )
 
     def train_step(data, label):
-        (loss, _), grads = grad_fn(data, label)
+        (loss, logits), grads = grad_fn(data, label)
         optimizer(grads)
-        return loss
+        return loss, logits
 
     def eval_model(dataset):
         total_correct = 0
@@ -178,9 +177,7 @@ def train_and_evaluate(
         train_total = 0
 
         for data, label in train_dataset.create_tuple_iterator():
-            loss = train_step(data, label)
-
-            logits = model(data)
+            loss, logits = train_step(data, label)
             predictions = ops.argmax(logits, 1)
             correct = ops.sum(predictions == label)
 
@@ -310,7 +307,7 @@ def run_experiments():
                 model,
                 train_dataset,
                 test_dataset,
-                epochs=5,
+                epochs=20,
                 learning_rate=params["learning_rate"],
                 optimizer_type=params["optimizer"],
                 verbose=True,
