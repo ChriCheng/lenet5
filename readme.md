@@ -2,139 +2,234 @@
 
 ## 项目概述
 
-本项目实现了经典的 LeNet-5 卷积神经网络，用于识别 MNIST 手写数字数据集。通过采用控制变量法，对学习率、批大小和优化器三种关键超参数进行了系统的对比实验，探究不同参数设置对模型性能的影响。
+本项目基于 **MindSpore** 实现经典的 **LeNet-5** 卷积神经网络，用于识别 MNIST 手写数字数据集。实验采用控制变量法，对 **学习率（Learning Rate）**、**批大小（Batch Size）** 和 **优化器（Optimizer）** 三组关键超参数进行对比，分析不同设置对模型训练效果的影响。
+
+
+## 实验目的
+
+本实验旨在通过构建经典的 LeNet-5 卷积神经网络，实现对 MNIST 手写数字数据集的识别。在此基础上，采用控制变量法分别调整学习率、批大小和优化器三种关键超参数，探究不同参数设置对模型训练过程及最终识别率的影响。
 
 ## 文件结构
 
-```
+```text
 lenet5_experiment/
-├── readme.md   
-├── LeNet5_MNIST_Experiment_Report.md
-├── LeNet5_MNIST_Experiment_Report.pdf
-├── LeNet5_MindSpore_Code.zip
-├── data
-│   ├── MNIST
-├── download_mnist.py
-├── environment.yml
-├── experiment_pytorch.py
-├── experiment_results.json
-├── experiment_runner_v2.py
-├── figures
-│   ├── batch_size_comparison.png
-│   ├── comprehensive_comparison.png
-│   ├── learning_rate_comparison.png
-│   └── optimizer_comparison.png
-├── lenet5_base.py
-├── log
-│   ├── torch.log
-│   ├── trainv2.log
-│   └── visualize.log
-├── readme.md                               # 实验报告
-└── visualize_results.py                    # 实验结果可视化脚本
-
-
-├── LeNet5_MNIST_Experiment_Report.pdf    # 完整的实验报告（PDF格式）
-├── LeNet5_MindSpore_Code.zip             # 核心代码打包文件
-├── lenet5_base.py                        # LeNet-5网络定义和基础训练代码
-├── experiment_runner_v2.py               # MindSpore版本的参数对比实验脚本
-├── experiment_pytorch.py                 # PyTorch版本的参数对比实验脚本（可选）
-├── visualize_results.py                  # 实验结果可视化脚本
-├── experiment_results.json               # 实验结果数据（JSON格式）
-├── figures/                              # 生成的图表目录
-│   ├── learning_rate_comparison.png
-│   ├── batch_size_comparison.png
-│   ├── optimizer_comparison.png
-│   └── comprehensive_comparison.png
-├── data/                                 # MNIST数据集目录
-└── README.md                             # 本文件
+├── readme.md                          # 当前项目说明与实验报告
+├── data/                              # 数据集目录
+│   └── MNIST/                         # MNIST 原始数据
+├── download_mnist.py                  # 下载 MNIST 数据集的脚本
+├── environment.yml                    # 项目环境配置文件
+├── experiment_pytorch.py              # PyTorch 版本的对比实验脚本
+├── experiment_results.json            # 参数对比实验结果数据
+├── experiment_runner_v2.py            # MindSpore 版本参数对比实验主脚本
+├── figures/                           # 实验结果图表目录
+│   ├── batch_size_comparison.png      # 批大小对比图
+│   ├── comprehensive_comparison.png   # 综合对比图
+│   ├── learning_rate_comparison.png   # 学习率对比图
+│   └── optimizer_comparison.png       # 优化器对比图
+├── lenet5_base.py                     # LeNet-5 网络定义与基础训练代码
+├── log/                               # 训练与可视化日志目录
+│   ├── torch.log                      # PyTorch 实验日志
+│   ├── trainv2.log                    # MindSpore 参数实验日志
+│   └── visualize.log                  # 图表生成日志
+└── visualize_results.py               # 实验结果可视化脚本
 ```
 
 ## 核心代码说明
 
-### 1. lenet5_base.py
-**功能：** 定义 LeNet-5 网络结构，实现基础的数据加载、模型训练和评估功能。
+### 1. `lenet5_base.py`
+
+**功能：** 定义 LeNet-5 网络结构，并实现基础的数据加载、模型训练和评估功能。
 
 **主要类和函数：**
-- `LeNet5(nn.Cell)`: LeNet-5 网络类，包含卷积层、池化层和全连接层
-- `create_mnist_dataset()`: 创建 MNIST 数据集加载器
-- `train_model()`: 模型训练函数
-- `evaluate_model()`: 模型评估函数
+
+- `LeNet5(nn.Cell)`：LeNet-5 网络类，包含卷积层、池化层和全连接层。
+- `create_mnist_dataset()`：创建 MNIST 数据集加载器。
+- `train_model()`：模型训练函数。
+- `evaluate_model()`：模型评估函数。
 
 **使用方法：**
+
 ```bash
 python3 lenet5_base.py
 ```
 
-### 2. experiment_runner_v2.py
-**功能：** 使用 MindSpore 框架运行参数对比实验，包括学习率、批大小和优化器的三组实验。
+### 2. `experiment_runner_v2.py`
+
+**功能：** 使用 MindSpore 框架运行参数对比实验，包括学习率、批大小和优化器三组实验。
 
 **实验设计：**
-- **学习率对比**：固定 SGD 优化器和批大小 32，测试学习率 0.001、0.01、0.1
-- **批大小对比**：固定 SGD 优化器和学习率 0.01，测试批大小 16、32、64
-- **优化器对比**：固定学习率 0.01 和批大小 32，测试 SGD、Adam、RMSprop
+
+- **学习率对比**：固定 SGD 优化器和批大小 32，测试学习率 `0.001`、`0.01`、`0.1`
+- **批大小对比**：固定 SGD 优化器和学习率 0.01，测试批大小 `16`、`32`、`64`
+- **优化器对比**：固定学习率 0.01 和批大小 32，测试 `SGD`、`Adam`、`RMSprop`
 
 **使用方法：**
+
 ```bash
 python3 experiment_runner_v2.py
 ```
 
-**输出：** `experiment_results.json` 文件包含所有实验的详细结果
+**输出：** `experiment_results.json` 文件包含所有实验的详细结果。
 
-### 3. experiment_pytorch.py
-**功能：** 使用 PyTorch 框架实现相同的参数对比实验（作为备选方案）。
+### 3. `experiment_pytorch.py`
+
+**功能：** 使用 PyTorch 框架实现相同的参数对比实验，作为对照或备选实现。
 
 **使用方法：**
+
 ```bash
 python3 experiment_pytorch.py
 ```
 
-### 4. visualize_results.py
-**功能：** 从实验结果 JSON 文件生成可视化图表。
+### 4. `visualize_results.py`
 
-**生成的图表：**
-1. `learning_rate_comparison.png` - 学习率对比的四个子图（测试准确率、训练准确率、训练时间、最优学习率的训练曲线）
-2. `batch_size_comparison.png` - 批大小对比的四个子图
-3. `optimizer_comparison.png` - 优化器对比的四个子图
-4. `comprehensive_comparison.png` - 综合对比的三个子图
+**功能：** 读取实验结果 JSON 文件并生成可视化图表。
+
+**生成图表：**
+
+1. `learning_rate_comparison.png`：学习率对比图
+2. `batch_size_comparison.png`：批大小对比图
+3. `optimizer_comparison.png`：优化器对比图
+4. `comprehensive_comparison.png`：综合对比图
 
 **使用方法：**
+
 ```bash
 python3 visualize_results.py
 ```
 
-## 网络结构详解
+## 网络结构与实验设置
 
-LeNet-5 是一个 7 层的卷积神经网络，具体结构如下：
+### 1. LeNet-5 网络结构
 
-| 层级 | 类型 | 参数 | 输出尺寸 |
-|------|------|------|---------|
-| 输入 | - | 28×28 灰度图 | 1×28×28 |
-| C1 | 卷积 | 6 个 5×5 卷积核 | 6×24×24 |
-| S2 | 池化 | 2×2 平均池化 | 6×12×12 |
-| C3 | 卷积 | 16 个 5×5 卷积核 | 16×8×8 |
-| S4 | 池化 | 2×2 平均池化 | 16×4×4 |
-| F5 | 全连接 | 120 个神经元 | 120 |
-| F6 | 全连接 | 84 个神经元 | 84 |
-| 输出 | 全连接 | 10 个神经元 | 10 |
+LeNet-5 是经典的卷积神经网络结构之一，适合用于手写数字识别任务。当前实验脚本中的 PyTorch 版本与 MindSpore `runner_v2` 已统一为先将 MNIST 图像缩放到 `32×32`，再输入网络，因此实际使用的结构如下：
 
-## 实验结果摘要
+| 层级    | 类型     | 参数设置                         | 输出尺寸 |
+| ------- | -------- | -------------------------------- | -------- |
+| Input   | 输入层   | 单通道灰度图                     | 1×32×32  |
+| C1      | 卷积层   | 6 个 5×5 卷积核，步长 1，无填充  | 6×28×28  |
+| S2      | 池化层   | 2×2 平均池化，步长 2             | 6×14×14  |
+| C3      | 卷积层   | 16 个 5×5 卷积核，步长 1，无填充 | 16×10×10 |
+| S4      | 池化层   | 2×2 平均池化，步长 2             | 16×5×5   |
+| Flatten | 展平层   | 将特征图展平                     | 400      |
+| F5      | 全连接层 | 120 个神经元                     | 120      |
+| F6      | 全连接层 | 84 个神经元                      | 84       |
+| Output  | 输出层   | 10 个神经元，对应数字 0–9        | 10       |
 
-### 学习率对比
-- **LR=0.001**: 测试准确率 95.2%（收敛缓慢）
-- **LR=0.01**: 测试准确率 95.5%（正常收敛）✓ 最优
-- **LR=0.1**: 测试准确率 12.6%（快速收敛）
+从 `log/torch.log` 的训练结果看，这个 `32×32` 版本的 LeNet-5 在 20 个 epoch 内可以稳定收敛到较高精度，说明将输入放大到更接近经典 LeNet-5 设定后，卷积层和全连接层的尺寸衔接是合理的。
 
-没有 momentum 沿稳定方向推进，过高学习率容易容易在梯度下降中难以有效降低loss
+### 2. 实验环境与数据集
 
-### 批大小对比
-- **BS=16**: 测试准确率 94.0%（耗时210.89s）
-- **BS=32**: 测试准确率 95.5%（耗时81.39s）✓ 最优
-- **BS=64**: 测试准确率 96.4%（耗时61.74s） 
+本实验提供 **MindSpore** 与 **PyTorch** 两套实现，数据集均使用经典的 **MNIST 手写数字数据集**。为了对齐两套实现，当前实验中统一采用以下预处理流程：
 
-合理的batchsize兼具准确度与耗时
-### 优化器对比
-- **SGD**: 测试准确率 95.5% ✓ 最优
-- **Adam**: 测试准确率 89.4%  
-- **RMSprop**: 测试准确率 73.6%
+1. 将单通道灰度图像缩放到 `32×32`
+2. 转换为浮点张量
+3. 使用 `mean=0.1307`、`std=0.3081` 进行标准化
+4. 采用单通道输入格式参与训练
+5. 固定随机种子方便复现试验
 
-这里是受到我自己科研的启发，在我的那个项目中adam优化器能提高约10%的准确度，此处是传统SGD效果最好
+结合 `log/torch.log` 可知，当前 PyTorch 对比实验使用的是 `5000` 个训练样本、`1000` 个测试样本的小规模设置，并在每组参数下训练 `20` 个 epoch。这意味着后续结果分析更适合解释为“在受控小样本对比实验中的相对趋势”，而不是完整 MNIST 训练的绝对上限。
+
+### 3. 实验设计
+
+本实验采用控制变量法，共设计三组对比实验。根据 `log/torch.log` 的实际运行结果，三组实验都能够在 20 个 epoch 内拉开明显差异，因此当前设置足以比较不同超参数对收敛速度、稳定性和最终精度的影响。
+
+1. **学习率对比实验**：固定优化器为 `SGD`，批大小为 `32`，比较学习率 `0.001`、`0.01` 和 `0.1`。
+2. **批大小对比实验**：固定优化器为 `SGD`，学习率为 `0.01`，比较批大小 `16`、`32` 和 `64`。
+3. **优化器对比实验**：固定学习率为 `0.01`、批大小为 `32`，比较 `SGD`、`Adam` 和 `RMSprop`。
+
+从 `torch.log` 的结果看，当前实验设置可以得到以下直接结论：
+
+1. 学习率并非越大越差。在 20 个 epoch 的 PyTorch 实验中，`lr=0.1` 最终达到 `96.8%` 测试准确率，高于 `0.01` 的 `94.0%` 和 `0.001` 的 `58.4%`，但中途波动更明显，说明较大学习率在当前结构上具有更快收敛潜力，同时也带来更强的不稳定性。
+2. 批大小存在精度与速度权衡。`batch_size=16` 取得最高测试准确率 `96.0%`，但耗时最长 `169.93s`；`batch_size=64` 最快，仅 `69.81s`，但最终测试准确率下降到 `91.4%`；`32` 则处于中间位置。
+3. 优化器方面，`Adam` 在当前 PyTorch 实验中表现最好，最终测试准确率 `96.9%`，略优于 `RMSprop` 的 `95.1%` 和 `SGD` 的 `94.0%`，说明在该小样本、20-epoch 设置下，自适应优化器更容易快速达到较高精度。
+
+## 实验结果与分析
+
+
+### 1. 学习率对比实验
+
+| 学习率 | 最终测试准确率 | 结果分析                       |
+| ------ | -------------- | ------------------------------ |
+| 0.001  | 95.2%          | 可以稳定收敛，但略低于 0.01    |
+| 0.01   | 95.5%          | 本组最优，兼顾稳定性与准确率   |
+| 0.1    | 12.6%          | 学习率过大，训练过程明显不稳定 |
+
+**分析：**
+从当前结果来看，`0.01` 是更合适的学习率设置。`0.001` 虽然最终也能取得较高准确率，但略低于 `0.01`；而 `0.1` 会导致模型训练不稳定，准确率明显下降。说明在本实验设置下，学习率过大反而会破坏梯度下降过程，使模型难以有效降低损失。
+
+![学习率对比](./figures/learning_rate_comparison.png)
+
+### 2. 批大小对比实验
+
+| 批大小 | 最终测试准确率 | 训练耗时 (s) | 结果分析                         |
+| ------ | -------------- | ------------ | -------------------------------- |
+| 16     | 94.0%          | 210.89       | 准确率较高，但训练耗时最长       |
+| 32     | 95.5%          | 81.39        | 在速度与准确率之间较均衡         |
+| 64     | 96.4%          | 61.74        | 当前实验中准确率最高，且耗时最短 |
+
+**分析：**
+在当前记录的实验结果中，批大小 `64` 的表现最好，不仅测试准确率最高，而且训练时间最短；`32` 的表现也较为均衡；`16` 虽然准确率不低，但耗时明显更长。说明在本次实验环境和训练轮数设置下，较大的批大小更有利于提高训练效率，并取得更好的最终结果。
+
+![批大小对比](./figures/batch_size_comparison.png)
+
+### 3. 优化器对比实验
+
+| 优化器  | 最终测试准确率 | 结果分析             |
+| ------- | -------------- | -------------------- |
+| SGD     | 95.5%          | 当前实验中效果最好   |
+| Adam    | 89.4%          | 表现良好，但低于 SGD |
+| RMSprop | 73.6%          | 本组表现最弱         |
+
+**分析：**
+从当前结果来看，`SGD` 在该任务中的表现优于 `Adam` 和 `RMSprop`。这主要受我科研的启发，我科研中`Adam`会容易提高准确度，对于当前的 LeNet-5 + MNIST 实验，传统 `SGD` 反而取得了更高的测试准确率。
+
+![优化器对比](./figures/optimizer_comparison.png)
+
+### 4. 综合结论
+
+结合上述三组实验，当前这组 LeNet-5 + MNIST 实验结果可以概括为：
+
+1. **学习率方面**：`0.01` 是当前最合适的设置，过大的学习率会导致训练失败。
+2. **批大小方面**：`64` 在当前实验中取得了最优的准确率与训练时间表现。
+3. **优化器方面**：`SGD` 的最终表现优于 `Adam` 和 `RMSprop`。
+
+![综合对比](./figures/comprehensive_comparison.png)
+
+## 运行方式
+
+### 1. 基础训练
+
+```bash
+python3 lenet5_base.py
+```
+
+### 2. 运行参数对比实验
+
+```bash
+python3 experiment_runner_v2.py
+```
+
+### 3. 生成实验图表
+
+```bash
+python3 visualize_results.py
+```
+
+### 4. 可选的 PyTorch 对照实验
+
+```bash
+python3 experiment_pytorch.py
+```
+
+## 结论
+
+本实验成功实现了 LeNet-5 卷积神经网络在 MNIST 数据集上的训练与测试，并通过控制变量法分析了学习率、批大小和优化器对模型性能的影响。
+
+根据当前 README 中的最新实验记录，可以得出以下结论：
+
+1. 学习率需要合理设置，过高会直接导致训练不稳定甚至失败。
+2. 批大小并非越小越好，在当前实验中，较大的批大小反而同时提升了速度和精度。
+3. 优化器的效果具有任务相关性，在当前实验中 `SGD` 优于 `Adam` 和 `RMSprop`。
+
+整体来看，本实验不仅验证了 LeNet-5 模型在 MNIST 数据集上的有效性，也帮助理解了不同训练参数对卷积神经网络性能的具体影响。

@@ -18,7 +18,7 @@ import time
 import random
 
 
-RANDOM_SEED = 42
+RANDOM_SEED = 43
 
 
 def set_random_seed(seed=RANDOM_SEED):
@@ -228,13 +228,9 @@ def run_experiments():
 
     data_path = "./data"
 
-    # 使用部分数据集以加快实验（5000训练样本，1000测试样本）
-    train_dataset_base = create_mnist_dataset(
-        data_path, batch_size=32, is_training=True, num_samples=5000
-    )
-    test_dataset_base = create_mnist_dataset(
-        data_path, batch_size=32, is_training=False, num_samples=1000
-    )
+    # 初始化
+    train_dataset_base = create_mnist_dataset(data_path, batch_size=32, is_training=True)
+    test_dataset_base = create_mnist_dataset(data_path, batch_size=32, is_training=False)
 
     print("数据集加载完成！\n")
 
@@ -290,13 +286,11 @@ def run_experiments():
                 data_path,
                 batch_size=params["batch_size"],
                 is_training=True,
-                num_samples=5000,
             )
             test_dataset = create_mnist_dataset(
                 data_path,
                 batch_size=params["batch_size"],
                 is_training=False,
-                num_samples=1000,
             )
 
             # 创建新的模型

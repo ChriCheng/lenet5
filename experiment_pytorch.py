@@ -15,7 +15,7 @@ import os
 import random
 
 
-RANDOM_SEED = 42
+RANDOM_SEED = 43
 
 
 def set_random_seed(seed=RANDOM_SEED):
@@ -85,7 +85,7 @@ class LeNet5(nn.Module):
 
 
 def create_mnist_dataloaders(
-    batch_size=32, num_train_samples=5000, num_test_samples=1000, seed=RANDOM_SEED
+    batch_size=32, num_train_samples=None, num_test_samples=None, seed=RANDOM_SEED
 ):
     """创建MNIST数据加载器"""
 
@@ -104,9 +104,10 @@ def create_mnist_dataloaders(
     )
 
     # 限制样本数量
-    train_dataset = torch.utils.data.Subset(
-        train_dataset, range(min(num_train_samples, len(train_dataset)))
-    )
+    if num_train_samples is not None:
+        train_dataset = torch.utils.data.Subset(
+            train_dataset, range(min(num_train_samples, len(train_dataset)))
+        )
 
     generator = torch.Generator()
     generator.manual_seed(seed)
@@ -125,9 +126,10 @@ def create_mnist_dataloaders(
     )
 
     # 限制样本数量
-    test_dataset = torch.utils.data.Subset(
-        test_dataset, range(min(num_test_samples, len(test_dataset)))
-    )
+    if num_test_samples is not None:
+        test_dataset = torch.utils.data.Subset(
+            test_dataset, range(min(num_test_samples, len(test_dataset)))
+        )
 
     test_loader = DataLoader(
         test_dataset, batch_size=batch_size, shuffle=False, num_workers=0
@@ -261,9 +263,7 @@ def run_experiments():
     print("=" * 70)
 
     # 创建基础数据加载器
-    train_loader_base, test_loader_base = create_mnist_dataloaders(
-        batch_size=32, num_train_samples=5000, num_test_samples=1000
-    )
+    train_loader_base, test_loader_base = create_mnist_dataloaders(batch_size=32)
 
     print("数据集加载完成！\n")
 
@@ -317,8 +317,6 @@ def run_experiments():
             # 创建新的数据加载器（使用指定的批大小）
             train_loader, test_loader = create_mnist_dataloaders(
                 batch_size=params["batch_size"],
-                num_train_samples=5000,
-                num_test_samples=1000,
                 seed=RANDOM_SEED,
             )
 
