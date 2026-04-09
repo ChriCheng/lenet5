@@ -28,15 +28,15 @@ lenet5_experiment/
 │   ├── batch_size_comparison.png          # 批大小对比图
 │   ├── comprehensive_comparison.png       # 综合对比图
 │   ├── learning_rate_comparison.png       # 学习率对比图
-│   └── optimizer_comparison.png           # 优化器对比图
+│   ├──  optimizer_comparison.png           # 优化器对比图
 │   └── rmsprop_runner_v2_comparison.png   # 不同学习率rmsprop的对比度
 ├── lenet5_base.py                         # LeNet-5 网络定义与基础训练代码
 ├── log/                                   # 训练与可视化日志目录
 │   ├── torch.log                          # PyTorch 实验日志
 │   ├── trainv2.log                        # MindSpore 参数实验日志
-│   └── visualize.log                      # 图表生成日志
+│   ├──  visualize.log                      # 图表生成日志
 │   ├── rmsprop_lr0001.log
-│   ├── rmsprop_lr001.log
+│   └──rmsprop_lr001.log
 └── visualize_results.py                   # 实验结果可视化脚本
 ```
 
