@@ -66,6 +66,12 @@ def annotate_bars(ax, xs, ys, fmt="{:.2f}s", dy=3, fontsize=10):
 with open("./experiment_results.json", "r", encoding="utf-8") as f:
     results = json.load(f)
 
+rmsprop_runner_v2_results = None
+rmsprop_runner_v2_path = Path("./experiment_rmsprop_runner_v2.json")
+if rmsprop_runner_v2_path.exists():
+    with open(rmsprop_runner_v2_path, "r", encoding="utf-8") as f:
+        rmsprop_runner_v2_results = json.load(f)
+
 # 创建输出目录
 output_dir = Path("./figures")
 output_dir.mkdir(exist_ok=True)
@@ -318,7 +324,89 @@ print("已保存: optimizer_comparison.png")
 plt.close()
 
 
-# ==================== 4. 综合对比 ====================
+# ==================== 4. RMSprop 复现实验对比 ====================
+if rmsprop_runner_v2_results is not None:
+    baseline_rmsprop = next(
+        result
+        for result in results["优化器对比"]["results"]
+        if result["optimizer"] == "RMSprop"
+    )
+    rerun_rmsprop = rmsprop_runner_v2_results["RMSprop单项复现实验"]["results"][0]
+
+    fig, axes = plt.subplots(1, 2, figsize=(14, 5.5))
+    fig.suptitle(
+        "RMSprop Accuracy Comparison: Main Experiment(lr=0.01) vs Standalone Rerun(lr=0.001)",
+        fontsize=16,
+        fontweight="bold",
+    )
+
+    baseline_epochs = list(range(1, len(baseline_rmsprop["history"]["train_acc"]) + 1))
+    rerun_epochs = list(range(1, len(rerun_rmsprop["history"]["train_acc"]) + 1))
+
+    axes[0].plot(
+        baseline_epochs,
+        baseline_rmsprop["history"]["train_acc"],
+        "o-",
+        linewidth=2,
+        label="lr=0.01",
+    )
+    axes[0].plot(
+        rerun_epochs,
+        rerun_rmsprop["history"]["train_acc"],
+        "s-",
+        linewidth=2,
+        label="lr=0.001",
+    )
+    axes[0].set_title("Train Accuracy")
+    axes[0].set_xlabel("Epoch", fontsize=11)
+    axes[0].set_ylabel("Accuracy", fontsize=11)
+    axes[0].grid(True, alpha=0.3)
+    axes[0].legend(fontsize=10)
+    set_zoomed_ylim(
+        axes[0],
+        baseline_rmsprop["history"]["train_acc"]
+        + rerun_rmsprop["history"]["train_acc"],
+        pad_ratio=0.15,
+        min_span=0.01,
+    )
+
+    axes[1].plot(
+        baseline_epochs,
+        baseline_rmsprop["history"]["test_acc"],
+        "o-",
+        linewidth=2,
+        label="lr=0.01",
+    )
+    axes[1].plot(
+        rerun_epochs,
+        rerun_rmsprop["history"]["test_acc"],
+        "s-",
+        linewidth=2,
+        label="lr=0.001",
+    )
+    axes[1].set_title("Test Accuracy")
+    axes[1].set_xlabel("Epoch", fontsize=11)
+    axes[1].set_ylabel("Accuracy", fontsize=11)
+    axes[1].grid(True, alpha=0.3)
+    axes[1].legend(fontsize=10)
+    set_zoomed_ylim(
+        axes[1],
+        baseline_rmsprop["history"]["test_acc"] + rerun_rmsprop["history"]["test_acc"],
+        pad_ratio=0.15,
+        min_span=0.01,
+    )
+
+    plt.tight_layout(rect=[0, 0, 1, 0.93])
+    plt.savefig(
+        output_dir / "rmsprop_runner_v2_comparison.png",
+        dpi=300,
+        bbox_inches="tight",
+    )
+    print("已保存: rmsprop_runner_v2_comparison.png")
+    plt.close()
+
+
+# ==================== 5. 综合对比 ====================
 fig, axes = plt.subplots(1, 3, figsize=(16, 5))
 fig.suptitle(
     "Comprehensive Comparison of All Experiments", fontsize=16, fontweight="bold"

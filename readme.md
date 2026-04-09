@@ -13,25 +13,31 @@
 
 ```text
 lenet5_experiment/
-├── readme.md                          # 当前项目说明与实验报告
-├── data/                              # 数据集目录
-│   └── MNIST/                         # MNIST 原始数据
-├── download_mnist.py                  # 下载 MNIST 数据集的脚本
-├── environment.yml                    # 项目环境配置文件
-├── experiment_pytorch.py              # PyTorch 版本的对比实验脚本
-├── experiment_results.json            # 参数对比实验结果数据
-├── experiment_runner_v2.py            # MindSpore 版本参数对比实验主脚本
-├── figures/                           # 实验结果图表目录
-│   ├── batch_size_comparison.png      # 批大小对比图
-│   ├── comprehensive_comparison.png   # 综合对比图
-│   ├── learning_rate_comparison.png   # 学习率对比图
-│   └── optimizer_comparison.png       # 优化器对比图
-├── lenet5_base.py                     # LeNet-5 网络定义与基础训练代码
-├── log/                               # 训练与可视化日志目录
-│   ├── torch.log                      # PyTorch 实验日志
-│   ├── trainv2.log                    # MindSpore 参数实验日志
-│   └── visualize.log                  # 图表生成日志
-└── visualize_results.py               # 实验结果可视化脚本
+├── readme.md                              # 当前项目说明与实验报告
+├── data/                                  # 数据集目录
+│   └── MNIST/                             # MNIST 原始数据
+├── download_mnist.py                      # 下载 MNIST 数据集的脚本
+├── environment.yml                        # 项目环境配置文件
+├── experiment_pytorch.py                  # PyTorch 版本的对比实验脚本
+├── experiment_results.json                # 参数对比实验结果数据
+├── experiment_rmsprop_runner_v2.json      # 单独rmsprop模块运行结果(lr=0.001)
+├── experiment_runner_v2.py                # MindSpore 版本参数对比实验
+├── experiment_runner_v2_rmsprop.py        # 单独的rmsprop模块
+主脚本
+├── figures/                               # 实验结果图表目录
+│   ├── batch_size_comparison.png          # 批大小对比图
+│   ├── comprehensive_comparison.png       # 综合对比图
+│   ├── learning_rate_comparison.png       # 学习率对比图
+│   └── optimizer_comparison.png           # 优化器对比图
+│   └── rmsprop_runner_v2_comparison.png   # 不同学习率rmsprop的对比度
+├── lenet5_base.py                         # LeNet-5 网络定义与基础训练代码
+├── log/                                   # 训练与可视化日志目录
+│   ├── torch.log                          # PyTorch 实验日志
+│   ├── trainv2.log                        # MindSpore 参数实验日志
+│   └── visualize.log                      # 图表生成日志
+│   ├── rmsprop_lr0001.log
+│   ├── rmsprop_lr001.log
+└── visualize_results.py                   # 实验结果可视化脚本
 ```
 
 ## 核心代码说明
@@ -49,9 +55,7 @@ lenet5_experiment/
 
 **使用方法：**
 
-```bash
-python3 lenet5_base.py
-```
+
 
 ### 2. `experiment_runner_v2.py`
 
@@ -63,11 +67,7 @@ python3 lenet5_base.py
 - **批大小对比**：固定 SGD 优化器和学习率 0.01，测试批大小 `16`、`32`、`64`
 - **优化器对比**：固定学习率 0.01 和批大小 32，测试 `SGD`、`Adam`、`RMSprop`
 
-**使用方法：**
 
-```bash
-python3 experiment_runner_v2.py
-```
 
 **输出：** `experiment_results.json` 文件包含所有实验的详细结果。
 
@@ -75,11 +75,7 @@ python3 experiment_runner_v2.py
 
 **功能：** 使用 PyTorch 框架实现相同的参数对比实验，作为对照或备选实现。
 
-**使用方法：**
 
-```bash
-python3 experiment_pytorch.py
-```
 
 ### 4. `visualize_results.py`
 
@@ -91,12 +87,7 @@ python3 experiment_pytorch.py
 2. `batch_size_comparison.png`：批大小对比图
 3. `optimizer_comparison.png`：优化器对比图
 4. `comprehensive_comparison.png`：综合对比图
-
-**使用方法：**
-
-```bash
-python3 visualize_results.py
-```
+5. `rmsprop_runner_v2_comparison.png`：rmsprop在lr=0.001和0.01的对比图
 
 ## 网络结构与实验设置
 
@@ -122,11 +113,12 @@ LeNet-5 是经典的卷积神经网络结构之一，适合用于手写数字识
 
 本实验当前的主要结果来自 **MindSpore `experiment_runner_v2.py`**，数据集使用经典的 **MNIST 手写数字数据集**。当前实验中统一采用以下预处理流程：
 
-1. 将单通道灰度图像缩放到 `32×32`
-2. 转换为浮点张量
-3. 使用 `mean=0.1307`、`std=0.3081` 进行标准化
-4. 采用单通道输入格式参与训练
-5. 固定随机种子方便复现试验
+1. 固定随机种子方便复现试验 
+2. 将单通道灰度图像缩放到 `32×32`
+3. 转换为浮点张量
+4. 使用 `mean=0.1307`、`std=0.3081` 进行标准化
+5. 采用单通道输入格式参与训练
+ 
 
 根据当前脚本设置与 `experiment_results.json`，`runner_v2` 使用完整 MNIST 官方划分进行实验：训练集 `60000` 张、测试集 `10000` 张，每组参数训练 `20` 个 epoch。因此后续结果更适合解释为在完整 MNIST 基准上的对比结论。
 
@@ -182,10 +174,10 @@ LeNet-5 是经典的卷积神经网络结构之一，适合用于手写数字识
 | RMSprop | 14.87%         | 基本发散，训练与测试精度同时下跌 |
 
 **分析：**
-从当前结果来看，`SGD` 在该任务中的表现显著优于 `Adam` 和 `RMSprop`。`Adam` 在前期能够快速提高精度，但后期出现明显崩溃，导致最终结果回落到 `92.50%`。`RMSprop` 则更为极端，训练集和测试集精度同时快速下跌，最终仅剩 `14.87%`，这更像优化发散而不是单纯的泛化变差。当前结果说明，在 `runner_v2` 这套 MindSpore 实现和默认超参数设置下，自适应优化器对学习率更敏感，若要公平比较，后续需要为 `Adam` 和 `RMSprop` 单独调节更合适的学习率。
+从当前结果来看，`SGD` 在该任务中的表现显著优于 `Adam` 和 `RMSprop`。`Adam` 在前期能够快速提高精度，但后期出现明显崩溃，导致最终结果回落到 `92.50%`。`RMSprop` 则更为极端，训练集和测试集精度同时快速下跌，核心原因是累积梯度机制下，`RMSprop`更需要精细的学习率控制，我额外比较`lr=0.01`和`lr=0.001`条件下的准确度，可以发现在后者情况下`RMSprop`也能取得不错的结果。
 
 ![优化器对比](./figures/optimizer_comparison.png)
-
+![comparation](./figures/rmsprop_runner_v2_comparison.png)
 ### 4. 综合结论
 
 结合上述三组实验，当前这组 LeNet-5 + MNIST 实验结果可以概括为：
@@ -196,31 +188,15 @@ LeNet-5 是经典的卷积神经网络结构之一，适合用于手写数字识
 
 ![综合对比](./figures/comprehensive_comparison.png)
 
-## 运行方式
+### 5. PyTorch 架构对比
 
-### 1. 基础训练
+根据 `log/torch.log` 的结果，PyTorch 版本在相同的 `32×32` 输入、`20` 个 epoch 和完整 MNIST 设置下，整体表现出更强的优化器稳定性。学习率实验中，PyTorch 的 `SGD + lr=0.1` 最终达到 `99.12%`，高于 MindSpore `runner_v2` 中对应设置的 `97.25%`；优化器实验中，PyTorch 的 `SGD / Adam / RMSprop` 分别达到 `98.82% / 97.77% / 96.90%`，
 
-```bash
-python3 lenet5_base.py
-```
+另一方面，两者在批大小实验中的最优点并不完全一致。PyTorch 中 `batch_size=16` 略优，最终测试准确率 `98.84%`；MindSpore `runner_v2` 中则是 `batch_size=64` 最优，达到 `98.87%`，同时训练时间也最短，整体耗时约`1200s~1000s`。这表明两套框架即使网络结构一致，数据管线、优化器实现和训练后端的差异仍会影响最佳超参数区域。
 
-### 2. 运行参数对比实验
 
-```bash
-python3 experiment_runner_v2.py
-```
 
-### 3. 生成实验图表
 
-```bash
-python3 visualize_results.py
-```
-
-### 4. 可选的 PyTorch 对照实验
-
-```bash
-python3 experiment_pytorch.py
-```
 
 ## 结论
 
@@ -229,7 +205,8 @@ python3 experiment_pytorch.py
 根据当前 `experiment_results.json` 的实验记录，可以得出以下结论：
 
 1. 学习率需要合理设置，在完整 MNIST 上 `0.001` 和 `0.01` 都表现稳定，而 `0.1` 会降低最终精度。
-2. 批大小并非越小越好，在当前实验中，较大的批大小反而同时提升了速度和精度，`64` 是最佳设置。
+2. 在当前实验中，较大的批大小反而同时提升了速度和精度，`64` 是最佳设置。
 3. 优化器的效果与实现和超参数密切相关，在当前 MindSpore `runner_v2` 设置下，`SGD` 明显优于 `Adam` 和 `RMSprop`。
 
-整体来看，本实验不仅验证了 LeNet-5 模型在 MNIST 数据集上的有效性，也帮助理解了不同训练参数对卷积神经网络性能的具体影响。
+## 最后
+代码已在github开源[https://github.com/ChriCheng/lenet5]
